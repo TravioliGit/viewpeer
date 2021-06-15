@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PeerView</title>
+    <script src='./view/view.js' type='module' async defer></script>
+    <script src='./elements.js' type='module' async defer></script>
+    <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans' />
+    <link href='https://fonts.googleapis.com/css2?family=Varela+Round&display=swap' rel='stylesheet'>
+    <link rel='stylesheet' type='text/css' href='./style.css'/>
+    <script src='https://apis.google.com/js/platform.js' async defer></script>
+    <meta name='google-signin-client_id' content='474436150788-dnoko9qcs6rt6hbjrdqh3tgvvlb8d2dp.apps.googleusercontent.com'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <nav class='nav-bar'>
+      <img id='nav-sidebar-button' src='./assets/nav-icon.png' style='grid-area: nav-nav'></img>
+      <img id='peerview-logo' style='grid-area: nav-logo' src='./assets/logo.png'></img>
+      <img id='nav-search' src='./assets/search-icon.png' style='grid-area: nav-search'></img>
+      <img id='notif-sidebar-button' src='./assets/notif-icon.png' style='grid-area: nav-notif'></img>
+    </nav>
+  </body>
+  <body>
+    <div id='page-container' class='body-container scrollable'>
+      <!--setup for the side navigation bars-->
+      <div id='nav-sidebar' class='sidebar scrollable'>
+        <div class='g-signin2' data-onsuccess='googleSignIn'></div>
+        <script>window.googleSignIn = async function (googleUser) { 
+          const authInEvent = new CustomEvent('auth', { detail: { in: 'in', key: googleUser.getAuthResponse().id_token } });
+          window.dispatchEvent(authInEvent);
+        }
+        </script>
+        <div id='nav-signout' onclick='googleSignOut()'>Sign out</div>
+        <script>window.googleSignOut = function () {
+          const signout = confirm('Are you sure you want to sign out?');
+          if (signout === true) {
+            const auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+              auth2.disconnect();
+              const authOutEvent = new CustomEvent('auth', { detail: { in: 'out' } });
+              window.dispatchEvent(authOutEvent);
+            });
+          }
+        }
+        </script>
+        <div id='nav-sidebar-upload'>Post New Publication</div>
+        <div id='nav-sidebar-recent'>Recent Publications</div>
+        <div id='nav-sidebar-user-pubs'>Your Publications</div>
+        <div id='nav-sidebar-cohorts'>Your Cohorts</div>
+        <div id='nav-sidebar-account'>Your Account</div>
+        <div id='nav-sidebar-about'>About Website/Contact Us</div>
+        <div id='nav-sidebar-theme'>Colour Theme</div>
+      </div>
+
+      <div id='notif-sidebar' class='sidebar'>
+        <div id='notif-refresh' class='button'>Refresh</div>
+        <div id='notif-list' class='scrollable'></div>
+        <div id='notif-offset' class='button'>Load More</div>        
+      </div>
+
+      <template id='notif-template'>
+        <div class='notif-wrapper' data-id data-value1 data-value2>
+          <span class='delete-button'>X</span>
+          <p>notif type</p>
+          <p>notif text</p>
+          <div class='notif-options'>
+            <div class='button'>Accept</div>
+            <div class='button'>Deny</div>  
+          </div>
+        </div>
+      </template>
+
+      <!--page setup for inspecting a publication. below templates allow for lists of citations, reviews, and comments-->
+      <div class='page' id='pub-inspect' data-id>
+        <div id='pub-info' class='section'>
+          <span class='header' id='pub-title'>Title</span>
+          <div id='pub-edit-button' class='button auth'>Edit Publication</div>
+          <div class='pub-header'>
+            <div>
+              <span id='pub-user-display' data-id>display</span>
+              <a href='' id='pub-download'>Download/Link to Publication</a>  
+            </div>
+            <div>
+              <span id='pub-of5'>/5<img class='star' src='./assets/star-icon.png'></img></span>
+              <span id='pub-cohort' data-id></span>
+              <span id='pub-area'></span>
+            </div>
+          </div>
+          <div class='pub-body' class='section'>
+            <div id='pub-abstract'>abstract</div>
+            <div id='pub-citation-container' class='scrollable'></div>
+          </div>
+        </div>
+        <div id='pub-review-container' class='auth section'>
+          <span for='of5'>Leave a rating out of 5:</span>
+          <select name='of5' id='review-of5'>
+            <option value='null'>--</option>
+            <option value='1'>1</option>
+            <option value='2'>2</option>
+            <option value='3'>3</option>
+            <option value='4'>4</option>
+            <option value='5'>5</option>
+          </select>
+          <br>
+          <span>Leave a written review? (optional)</span><br>
+          <input id='review-input' type='textarea' placeholder='Review here...' maxlength='1000'></input><br>
+          <div id='review-submit' class='button' disabled>Submit Review</div>
+        </div>
+        <div id='pub-review-list-container' class='scrollable'></div>
+        <div id='pub-review-list-offset' data-offset class='button'>Load More</div>
+      </div>
+
+      <!--page setup for the upload/manage publication page-->
+      <div class='page' id='pub-manage' data-id>
+        <span class='header'></span>
+        <div class='pub-header section'>
+          <input id='pub-title-input' type='text' placeholder='Title...' maxlength='150' required></input>
+          <select id='pub-area-input'>
+            <option value='null'>--no area--</option>
+          </select>
+          <select id='pub-cohort-input'>
+            <option value='null'>--no cohort--</option>
+          </select>
+          <input id='pub-abstract-input' type='textarea' placeholder='Abstract...' maxlength='500'></input>
+        </div>
+        <div class='section'>
+          <div id='pub-citation-input-list' class='scrollable'></div>
+        </div>
+        <div id='pub-citation-input-container'>
+          <input id='pub-citation-text-input' type='textarea' placeholder='Citation...' maxlength='150'></input>
+          <input id='pub-citation-link-input' type='text' placeholder='Link to citation...'></input>
+          <div id='citation-add-button' class='button'></div>
+        </div><br>
+        <span>Do you have your publication as a .pdf file or as an external link?</span>
+        <div class='section'>
+          <div id='pub-check-file' class='button' data-check>PDF</div>
+          <div id='pub-check-link' class='button' data-check>Link</div>
+          <input id='pub-link-input' class='auth' type='text' placeholder='Link here...'></input>
+          <input id='pub-pdf-input' class='auth' type='file' accept='application/pdf' hidden/><span id='pub-pdf-input-button' class='button'>Choose PDF</span>
+          <p></p>
+        </div>
+        <div id='pub-delete' class='button submit'>Delete Publication?</div>
+        <div id='pub-info-save' class='button submit'>Save Publication</div>
+      </div>
+
+      <!--templates for publication viewing-->
+      <template id='citation-template'>
+        <div class='citation-container' data-new>
+          <a>text here</a>
+          <span class='auth'>X</span>
+        </div>
+      </template>
+
+      <template id='review-template'>
+        <div class='review-container'>
+          <img class='avatar' src='./assets/placeholder-avatar.png'></img>
+          <div class='review-inner'>
+            <span>username here</span>
+            <span>/5<img class='star' src='./assets/star-icon.png'></img></span>
+            <span class='date'>date</span>
+            <span class='auth delete-button'>X</span>
+          </div>
+          <p>review content here</p><br>
+          <div class='scrollable'>ᐯ Click to view comments</div>
+          <div class='auth'>
+            <span>Post a comment?</span><br>
+            <input type='text' placeholder='Comment here...' max-length='500'>
+            <span class='button'>Add comment</span>
+          </div>
+        </div>
+      </template>
+
+      <template id='comment-template'>
+        <div class='comment-container'>
+          <div class='comment-inner'>
+            <img class='avatar' src='./assets/placeholder-avatar.png'></img> 
+            <span>username here</span>
+            <span class='date'>date</span>
+            <span class='auth delete-button'>X</span>
+          </div>
+          <p>comment content here</p>
+        </div>
+      </template>
+
+      <!--page setup for inspecting a cohort-->
+      <div class='page' id='cohort-inspect' data-id>
+        <div class='header' id='cohort-name'>name</div>
+        <div id='cohort-edit-button' class='button auth'>Edit Cohort</div>
+        <div class='cohort-info section'>
+          <img id='cohort-avatar' class='big-avatar' src='./assets/placeholder-cohort.png'></img>
+          <span id='cohort-birthday' class='date'>birthday</span>
+          <span id='cohort-admin'>admin</span>
+          <div id='cohort-desc'>description</div>
+        </div><br>
+        <div class='dual-lists'>
+          <span>Users in this Cohort:</span>
+          <div id='cohort-user-info'>list here</div>
+          <span>Publications by this Cohort:</span>
+          <div id='cohort-pub-info'>list here</div>
+        </div>
+      </div>
+      
+      <!--page setup for editing a cohort-->
+      <div class='page' id='cohort-manage' data-id>
+        <span class='header'>Editing Cohort</span>
+        <div class='cohort-info section'>
+          <img id='cohort-avatar-input' class='big-avatar' src='./assets/placeholder-cohort.png'></img>
+          <input id='cohort-name-input' placeholder='Cohort Name...' maxlength='60' type='text'>name</input>
+          <input id='cohort-desc-input' type='textarea' maxlength='500'>description</input>
+        </div><br>
+        <input id='change-cohort-avatar-input' type='file' accept='image/png' hidden/><span id='change-cohort-avatar-button' class='button '>Choose Avatar</span>
+        <div class='dual-lists'>
+          <span>Users in this Cohort:</span>
+          <span>Publications by this Cohort:</span>
+          <div id='cohort-user-manage'>user here</div>
+          <div id='cohort-pubs-manage'>pub here</div>
+        </div>
+        <div class='button submit' id='cohort-delete-button'>Delete Cohort?</div>
+        <div class='button submit' id='cohort-save-button'>Save Cohort</div>
+      </div>
+
+      <template id='list'>
+        <div class='list-item'>
+          <p>name</p>
+          <span class='auth'>Make Admin</span>
+          <span class='auth'>Kick User</span>
+        </div>
+      </template>
+      
+      <!--page setup for inspecting a user-->
+      <div id='user-inspect-page' class='page'>
+        <div class='user-header' class='section'>
+          <span id='user-disp-name' class='header'></span>
+        </div>
+        <div class='user-info section'>
+          <img id='user-avatar' class='big-avatar' src='./assets/placeholder-avatar.png'></img>
+          <span id='user-name'></span> 
+          <span id='user-email'></span>
+        </div><br>
+        <span id='user-about' class='section'></span><br>
+        <div id='user-edit' class='button auth '>Edit Your Info</div>
+        <select name='cohort-inv' id='cohort-invite-list' class='auth'>
+          <option value='null'>Cohort</option>
+        </select>
+        <div id='cohort-invite-button' class='button auth'>Invite to Cohort</div>
+        <span>User's Publications:</span>
+        <span>Member of Cohorts:</span>
+        <div class='dual-lists'>
+          <div id='user-pubs' class='scrollable'></div>
+          <div id='user-cohorts' class='scrollable'></div>
+        </div>
+      </div>
+      
+      <!--page setup for editing the user's account-->
+      <div id='user-manage-page' class='page'>
+        <span class='header'>Edit Your Information</span>
+        <div class='user-info' class='section'>
+          <img id='user-avatar-input' class='big-avatar' src='./assets/placeholder-avatar.png'></img>
+          <input id='user-disp-input' type='text' placeholder='Username...' maxlength='30'></input>
+          <input id='user-fname-input' type='text' placeholder='First name...' maxlength='30'></input> 
+          <input id='user-lname-input' type='text' placeholder='Surname...' maxlength='30'></input>
+          <input id='user-email-input' type='text' placeholder='Email...' maxlength='80'></input>
+        </div><br>
+        <input id='change-user-avatar-input' type='file' accept='image/png' hidden/><span id='change-user-avatar-button' class='button'>Choose an Avatar</span>
+        <input id='user-about-input' type='textarea' placeholder='Something about yourself...'></input>
+        <div id='user-delete' class='button submit'>Delete Your Profile?</div>
+        <div id='user-save' class='button submit'>Save Information</div>
+      </div>
+
+      <!--page setup for the search and its listings (uses result-template and feed-template below)-->
+      <div id='search-page' class='page'>
+        <div class='search-params'>
+          <div id='search-cohort' class='button' data-filter>Cohort Name</div>
+          <div id='search-user' class='button' data-filter>User Name</div>
+          <div id='search-pub' class='button' data-filter>Publication Title</div>
+        </div><br>
+        <div class='search-info' class='section'>
+          <span class='header'>Search using the bar below. You can apply a filter by using the buttons above.</span>
+          <input id='search-bar' type='text' placeholder='What are you looking for?' required><div id='search-go' class='button '>Search</div></input>
+        </div>
+        <br>
+        <div id='search-results' class='scrollable'></div>
+        <div id='search-offset' class='button auth'>Load More</div>
+      </div>
+
+      <!--page setup for the main feed page-->
+      <div id='feed-page' class='page'>
+        <span class='header'>Browsing Recently Uploaded Publications</span>
+        <div id='feed-results'></div>
+        <div id='feed-offset' class='button auth'>Load More</div>
+      </div>
+
+      <!--page setup for cohort and publication list sidebar items-->
+      <div id='your-page' class='page'>
+        <span id='your-header' class='header'>Your {list}</span>
+        <div class='section'>
+          <div id='new-cohort' class='button'>New Cohort</div>
+          <div id='new-pub' class='button'>New Publication</div>
+        </div>
+        <div id='your-list' class='section'></div>
+      </div>
+
+      <template id='feed-template'>
+        <div class='feed-item'>
+          <p>Publication Title</p>
+          <span class='date'>date</span>
+          <p>Publication Author</p>
+          <p>Publication Synopsis</p>
+        </div>
+      </template>
+
+      <template id='result-template'>
+        <div class='result-item'>
+          <img class='avatar' src='./assets/placeholder-avatar.png'></img>
+          <span>name</span>
+        </div>
+      </template>
+
+      <!--page setup for the about website page-->
+      <div id='about-page' class='page'>
+        <span>Welcome to PeerView! The Peer Review website. The website started life as a coursework project, and ended its life as such. Doing this coursework has been a very enlightening challenge. Beyond putting me under stress levels that I have never experienced before, it has been a very fun technical exercise and a good learning experience. If you'd like to get in touch for queries, advice or technical support, the app developer's information is below:</span>
+        <span>up938828@myport.ac.uk</span>
+      </div>
+
+      <!--page setup for the error handling page-->
+      <div id='error-page' class='page'>
+        <span>There was an error loading the information needed for this page. Please use the button below to try again. If the problem persists, contact the website administrator, using the information on our About page.</span>
+        <span id='error-button' class='button'>Try again</span>
+      </div>
+    </div>
+  </body>
+</html>

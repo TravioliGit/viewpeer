@@ -1,0 +1,391 @@
+:root[theme='light'] {
+  --body-colour: white;
+  --sidebar-colour: lightgray;
+  --button-colour: gray;
+  --button-border: rgb(99, 99, 99); 
+  --hover-colour: gray;
+  --font-colour: black;
+  --border-colour: #3a3a3a;
+}
+
+/*dark theme pallettes found at */
+:root[theme='dark'] {
+  --body-colour: #121212;
+  --sidebar-colour: #2e2e2e;
+  --button-colour: #4b4b4b;
+  --button-border: #797979; 
+  --hover-colour: #4b4b4b;
+  --font-colour: #ffffff;
+  --border-colour: lightgray;
+}
+
+.nav-bar {
+  background-color: #303030;
+  height: 4.5rem;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 10% 30% 40% 10% 10%;
+  grid-template-rows: auto;
+  grid-template-areas: 'nav-nav nav-logo . nav-search nav-notif';
+}
+
+.nav-bar img {
+  justify-self: center;
+  height: 3rem;
+  margin-top: .7rem;
+  margin-left: .7rem;
+}
+
+#peerview-logo {
+  height: 3.7rem;
+  margin-top: .3rem;
+}
+/* top-level classes for general application */
+.body-container {
+  position: fixed;
+  margin-top: 4rem;
+  left: 0;
+  height: 90%;
+  width: 100%;
+  background-color: var(--body-colour);
+  color: var(--font-colour);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  z-index: 0;
+}
+
+.page {
+  display: none;
+  padding-top: 1.5rem;
+  padding-bottom: 4rem;
+  text-align: center;
+  justify-content: center;
+  left: 10%;
+  position: relative;
+  width: 80%;
+}
+
+input [type='textarea'] {
+  resize: none;
+  width: 80%;
+}
+
+input [type='text'] {
+  size: 150;
+}
+
+.button {
+  margin: 0 auto;
+  justify-self: space-between;
+  cursor: pointer;
+  display: flex;
+  width: 10%;
+  height: 10%;
+}
+
+.delete-button {
+  margin: 2%;
+  float: right;
+  width: 10%;
+}
+
+.button, .delete-button {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: var(--button-colour);
+  border-color: var(--button-border);
+  border-style: solid;
+}
+
+.header {
+  font-size: 1.5rem;
+}
+
+.auth {
+  display: none;
+}
+
+.scrollable {
+  overflow-y: scroll;
+}
+
+.dual-lists {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.dual-lists > span {
+justify-content: space-evenly;
+  float: top;
+}
+
+.dual-lists > div {
+  border-color: var(--border-colour);
+  border-style: solid;
+  width: 35%;
+}
+
+.avatar {
+  display: flex;
+  float: left;
+  max-width: 125px;
+}
+
+.big-avatar {
+  display: flex;
+  float: left;
+  max-width: 300px;
+}
+
+.star {
+  max-width: 25px;
+  max-height: 25px;
+}
+
+.section {
+  display: block;
+  border-color: var(--border-colour);
+  border-bottom-style: solid;
+  width: 100%;
+  min-height: 8rem;
+}
+
+/* styling specific to both sidebars */
+.sidebar {
+  display: none;
+  width: 30%;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  justify-items: center;
+  display: none;
+  background-color: var(--sidebar-colour);
+  z-index: 1;
+}
+
+.sidebar > div {
+  width: 100%;
+  align-items: center;
+  border-color: var(--border-colour);
+  border-bottom-style: solid;
+}
+
+#nav-sidebar > div {
+  height: 4rem;
+  display: flex;
+  justify-content: center;
+  margin: auto auto;
+}
+
+#notif-sidebar {
+  left: auto;
+  right: 0;
+}
+
+#notif-list {
+  height: 80%;
+}
+
+#notif-refresh {
+  height: 5%;
+}
+
+#notif-offset {
+  justify-content: right;
+  padding-left: 12%;
+  height: 5%;
+  position: fixed;
+  bottom: 0;
+}
+
+.notif-wrapper {
+  display: block; 
+  height: 9rem;
+  border-color: var(--border-colour);
+  border-bottom-style: solid;
+}
+
+.notif-options {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.notif-options > div {
+  text-align: center;
+  width: 40%;
+  background-color: var(--button-colour);
+}
+
+/*styling specific to elements found on search page*/
+.search-params {
+  display: flex;
+  position: relative;
+  top: 0;
+  justify-content: space-evenly;
+}
+
+.search-params > div {
+  margin-top: auto;
+  width: 25%;
+}
+
+/*styling used on user-related pages*/
+#user-manage-page {
+  display: flex;
+}
+
+#user-manage-page .button {
+  justify-content: space-between;
+}
+
+.user-info {
+  border-color: var(--border-colour);
+  border-bottom-style: solid;
+}
+
+.user-info > img { 
+  padding: 1rem;
+  float: left;
+}
+
+.user-info > span {
+  display: block;
+  text-align: left;
+}
+
+/*styling used for publication-related pages*/
+#pub-info {
+  display: block;
+  text-align: left;
+  justify-content: space-around;
+}
+
+#pub-citation-input-container {
+  display: block;
+  align-content: center;
+}
+
+#pub-citation-input-container > input {
+  justify-content: space-evenly;
+}
+
+.pub-manage .section {
+  justify-content: space-around;
+  min-width: 60%;
+}
+
+.pub-header-section {
+  display: block;
+  text-align: left;
+  justify-content: space-around;
+}
+
+#pub-review-container {
+  display: inline-block;
+}
+
+#pub-review-list-container {
+  display: block;
+}
+
+.review-container {
+  display: block;
+}
+
+.review-container > p {
+  text-align: left;
+}
+
+.review-inner {
+  display: flex;
+  min-width: 100%;
+}
+
+.review-inner > span {
+  padding-left: 5%;
+  align-self: left;
+  vertical-align: middle;
+  text-align: left;
+}
+
+.comment-container {
+  display: flex;
+  width: 85%;
+  align-self: right;
+}
+
+.date {
+  float: right;
+  color: gray;
+}
+
+/*styling used for cohort-related pages*/
+#cohort-manage-page {
+  display: block;
+}
+
+.cohort-info {
+  display: flex;
+}
+
+.cohort-info > div {
+  display: flex;
+  float: bottom;
+  text-align: left;
+}
+
+#cohort-manage-page .button {
+  justify-content: space-between;
+}
+
+/*styling for all templates used on pages*/
+.feed-item {
+  width: 100%;
+  text-align: left;
+  border-color: var(--border-colour);
+  border-bottom-style: solid;
+}
+
+#feed-offset {
+  position: relative;
+  bottom: 0;
+}
+
+.result-item {
+  width: 90%;
+  padding-left: 1.5rem;
+  border-color: var(--border-colour);
+  border-bottom-style: solid;
+  min-height: 5rem;
+}
+
+.result-item > img{
+  width: 100px;
+}
+
+/*styling for mobile viewers*/
+@media only screen and (max-width:700px) {
+  .nav-bar {
+    grid-template-columns: 20% 30% 15% 15% 15%;
+    grid-template-rows: auto;
+    grid-template-areas: 'nav-nav nav-logo . nav-search nav-notif';
+  }
+
+  .nav-bar img {
+    margin-right: 5%;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  #notif-offset {
+    justify-content: center;
+    padding-left: 0;
+  }
+}
